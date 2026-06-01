@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { PlanActual, Transaction } from '../types';
 import { useBudgetStore } from '../store/budgetStore';
+import { useBackupStore } from '../store/backupStore';
 import { todayISO } from '../lib/format';
 
 interface Props {
@@ -15,6 +16,8 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
   const addTransaction = useBudgetStore((s) => s.addTransaction);
   const updateTransaction = useBudgetStore((s) => s.updateTransaction);
   const deleteTransaction = useBudgetStore((s) => s.deleteTransaction);
+  const templates = useBudgetStore((s) => s.templates);
+  const addTemplate = useBudgetStore((s) => s.addTemplate);
 
   const editing = !!initial;
   const [date, setDate] = useState(initial?.date ?? todayISO());
@@ -37,6 +40,31 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
   const matchingItems =
     month?.budgetItems.filter((i) => i.category === category) ?? [];
 
+  const applyTemplate = (t: (typeof templates)[number]) => {
+    setKind(t.kind);
+    setContent(t.content);
+    setCategory(t.category);
+    setItemId(t.itemId ?? '');
+    if (typeof t.amount === 'number') setAmount(String(Math.abs(t.amount)));
+  };
+
+  const saveAsTemplate = () => {
+    const label = content.trim();
+    if (!label) {
+      alert('テンプレ名にする「内容」を入力してください。');
+      return;
+    }
+    const value = Number(amount);
+    addTemplate({
+      label,
+      content: label,
+      category,
+      itemId: itemId || null,
+      kind,
+      amount: Number.isFinite(value) && value !== 0 ? Math.abs(value) : undefined,
+    });
+  };
+
   const save = () => {
     const value = Number(amount);
     if (!Number.isFinite(value) || value === 0) return;
@@ -52,10 +80,14 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
     };
     if (editing && initial) {
       updateTransaction(monthId, { ...base, id: initial.id });
+      onClose();
     } else {
       addTransaction(monthId, base);
+      onClose();
+      const backup = useBackupStore.getState();
+      backup.markChanged();
+      if (backup.askOnSave) backup.openPrompt();
     }
-    onClose();
   };
 
   const remove = () => {
@@ -79,6 +111,21 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
         <h2 className="mb-4 text-lg font-bold text-slate-800">
           {editing ? '記録を編集' : '収支を記録'}
         </h2>
+
+        {!editing && templates.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {templates.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => applyTemplate(t)}
+                className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-600 ring-1 ring-violet-200 active:bg-violet-100"
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -202,6 +249,16 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
               className={inputCls}
             />
           </div>
+
+          {!editing && (
+            <button
+              type="button"
+              onClick={saveAsTemplate}
+              className="w-full rounded-xl bg-violet-50 py-2.5 text-sm font-semibold text-violet-600 ring-1 ring-violet-200 active:bg-violet-100"
+            >
+              ＋ この内容をテンプレに保存
+            </button>
+          )}
         </div>
 
         <div className="mt-5 flex gap-2">

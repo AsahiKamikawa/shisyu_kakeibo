@@ -6,6 +6,7 @@ import type {
   CarryoverMode,
   Month,
   Transaction,
+  TxTemplate,
 } from '../types';
 import { createSeedData } from '../data/seed';
 import { projectedEndBalance, actualEndBalance } from '../lib/calc';
@@ -39,6 +40,9 @@ interface BudgetState extends BudgetData {
   addCategory: (name: string) => void;
   renameCategory: (oldName: string, newName: string) => void;
   deleteCategory: (name: string) => void;
+
+  addTemplate: (t: Omit<TxTemplate, 'id'>) => void;
+  deleteTemplate: (id: string) => void;
 
   importData: (data: BudgetData) => void;
   resetData: () => void;
@@ -126,16 +130,29 @@ export const useBudgetStore = create<BudgetState>()(
             ? actualEndBalance(source)
             : projectedEndBalance(source)
           : 0;
+        const newItems: BudgetItem[] = source
+          ? source.budgetItems.map((i) => ({ ...i, id: uid() }))
+          : [];
+        // 固定費（recurring）は「予定」取引として毎月1日に自動計上する
+        const autoTx: Transaction[] = newItems
+          .filter((i) => i.recurring && i.plannedAmount !== 0)
+          .map((i) => ({
+            id: uid(),
+            date: `${newId}-01`,
+            content: i.name,
+            category: i.category,
+            itemId: i.id,
+            amount: i.plannedAmount,
+            planActual: '予定',
+          }));
         const newMonth: Month = {
           id: newId,
           label: monthLabel(newId),
           startBalance: carryBalance,
           assumedSalary: source?.assumedSalary ?? 200000,
           defenseLine: carryBalance,
-          budgetItems: source
-            ? source.budgetItems.map((i) => ({ ...i, id: uid() }))
-            : [],
-          transactions: [],
+          budgetItems: newItems,
+          transactions: autoTx,
         };
         set({
           months: [...s.months, newMonth].sort((a, b) => a.id.localeCompare(b.id)),
@@ -189,19 +206,33 @@ export const useBudgetStore = create<BudgetState>()(
       deleteCategory: (name) =>
         set((s) => ({ categories: s.categories.filter((c) => c !== name) })),
 
+      addTemplate: (t) =>
+        set((s) => ({ templates: [...s.templates, { ...t, id: uid() }] })),
+
+      deleteTemplate: (id) =>
+        set((s) => ({ templates: s.templates.filter((t) => t.id !== id) })),
+
       importData: (data) =>
         set(() => ({
           categories: data.categories,
           months: data.months,
           currentMonthId: data.currentMonthId,
           carryoverMode: data.carryoverMode,
+          templates: data.templates ?? [],
         })),
 
       resetData: () => set(() => ({ ...createSeedData() })),
     }),
     {
       name: 'kakeibo-budget-data',
-      version: 1,
+      version: 2,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Partial<BudgetData>;
+        if (version < 2 && !Array.isArray(state.templates)) {
+          state.templates = [];
+        }
+        return state as BudgetData;
+      },
     },
   ),
 );

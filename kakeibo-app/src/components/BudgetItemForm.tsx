@@ -26,6 +26,7 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
     initial?.category ?? categories.find((c) => c !== '開始残高') ?? categories[0] ?? '',
   );
   const [memo, setMemo] = useState(initial?.memo ?? '');
+  const [recurring, setRecurring] = useState(initial?.recurring ?? false);
 
   const save = () => {
     const value = Number(amount);
@@ -36,6 +37,7 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
       category,
       plannedAmount: signed,
       memo: memo.trim() || undefined,
+      recurring,
     };
     if (editing && initial) {
       updateBudgetItem(monthId, { ...base, id: initial.id });
@@ -144,6 +146,30 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
               className={inputCls}
             />
           </div>
+
+          <label className="flex items-center justify-between gap-3 rounded-xl bg-violet-50/60 px-3 py-2.5">
+            <span className="flex flex-col">
+              <span className="text-sm font-medium text-slate-700">毎月自動計上</span>
+              <span className="text-xs text-slate-400">
+                新しい月を作るとき「予定」として自動で記録します
+              </span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={recurring}
+              onClick={() => setRecurring(!recurring)}
+              className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+                recurring ? 'bg-violet-500' : 'bg-slate-300'
+              }`}
+            >
+              <span
+                className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                  recurring ? 'left-6' : 'left-1'
+                }`}
+              />
+            </button>
+          </label>
         </div>
 
         <div className="mt-5 flex gap-2">

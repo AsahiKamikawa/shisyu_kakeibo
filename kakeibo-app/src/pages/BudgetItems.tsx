@@ -98,7 +98,14 @@ export function BudgetItems() {
                 className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
               >
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate font-medium text-slate-700">{i.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="truncate font-medium text-slate-700">{i.name}</span>
+                    {i.recurring && (
+                      <span className="shrink-0 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-600">
+                        毎月
+                      </span>
+                    )}
+                  </div>
                   <span className="text-xs text-slate-400">{i.category}</span>
                 </div>
                 <span
