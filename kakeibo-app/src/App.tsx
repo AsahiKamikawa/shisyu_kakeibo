@@ -20,7 +20,7 @@ export default function App() {
   const [tab, setTab] = useState<TabId>('home');
 
   return (
-    <div className="mx-auto flex h-[100dvh] max-w-md flex-col overflow-hidden">
+    <div className="app-shell mx-auto flex max-w-md flex-col overflow-hidden">
       <header className="safe-top z-10 shrink-0 border-b border-violet-200/60 bg-white/70 backdrop-blur">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex flex-col">

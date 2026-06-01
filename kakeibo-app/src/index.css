@@ -48,3 +48,10 @@ input[type='number'] {
   background-clip: text;
   color: transparent;
 }
+
+/* アプリシェルの高さ。dvh 未対応ブラウザでも崩れないようフォールバックを段階指定 */
+.app-shell {
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+}
