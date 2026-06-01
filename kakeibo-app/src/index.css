@@ -52,9 +52,8 @@ input[type='number'] {
   color: transparent;
 }
 
-/* アプリシェルの高さ。dvh 未対応ブラウザでも崩れないようフォールバックを段階指定 */
+/* アプリシェルの高さ。body を position:fixed; inset:0 で画面全体に固定しているため、
+   その内側いっぱい（100%）にすればどの端末でもタブバーが最下部にぴったり付く。 */
 .app-shell {
-  height: 100vh;
-  height: 100svh;
-  height: 100dvh;
+  height: 100%;
 }
