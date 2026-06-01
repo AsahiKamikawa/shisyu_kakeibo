@@ -14,13 +14,16 @@ body {
   margin: 0;
   color: #334155;
   background: linear-gradient(160deg, #d6ecff 0%, #e7e0ff 48%, #f7e3ff 100%);
-  background-attachment: fixed;
-  min-height: 100%;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans',
     'Yu Gothic', Meiryo, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: none;
+  /* iOS のラバーバンド（はね返り）でページ全体が動くのを防ぐ。
+     本文だけを内側でスクロールさせ、土台は完全固定にする。 */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* iOS safe-area helpers */

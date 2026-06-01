@@ -33,7 +33,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
+      <main className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6 pt-4">
         {tab === 'home' && <Dashboard />}
         {tab === 'tx' && <Transactions />}
         {tab === 'budget' && <BudgetItems />}
