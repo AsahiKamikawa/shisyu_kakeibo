@@ -1,0 +1,15 @@
+# 個人データ（公開リポジトリに上げない）
+kakeibo-personal-backup.json
+*.xlsx
+*.xls
+
+# 依存・ビルド成果物
+node_modules/
+kakeibo-app/node_modules/
+kakeibo-app/dist/
+kakeibo-app/dist-ssr/
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+*.log
