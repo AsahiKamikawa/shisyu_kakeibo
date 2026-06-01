@@ -12,13 +12,14 @@ const emblem = (size, rounded) => {
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#065f46"/>
-      <stop offset="1" stop-color="#0f172a"/>
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="0.55" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#c084fc"/>
     </linearGradient>
   </defs>
   <rect width="${size}" height="${size}" rx="${r}" ry="${r}" fill="url(#bg)"/>
   <polyline points="${size * 0.24},${size * 0.66} ${size * 0.42},${size * 0.5} ${size * 0.56},${size * 0.58} ${size * 0.78},${size * 0.34}"
-    fill="none" stroke="#34d399" stroke-width="${size * 0.045}" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    fill="none" stroke="#ffffff" stroke-width="${size * 0.045}" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
   <text x="${cx}" y="${size * 0.62}" text-anchor="middle"
     font-family="Arial, sans-serif" font-size="${size * 0.5}" font-weight="700" fill="#ffffff">¥</text>
 </svg>`;

@@ -51,7 +51,7 @@ export function Settings() {
   };
 
   const inputCls =
-    'w-full rounded-xl bg-slate-700/60 px-3 py-2.5 text-slate-100 ring-1 ring-white/5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50';
+    'w-full rounded-xl bg-violet-50 px-3 py-2.5 text-slate-800 ring-1 ring-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400';
 
   return (
     <div className="space-y-5">
@@ -69,22 +69,22 @@ export function Settings() {
               key={mode}
               type="button"
               onClick={() => setCarryoverMode(mode)}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left active:bg-white/5"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left active:bg-violet-50"
             >
               <span
                 className={`grid h-5 w-5 shrink-0 place-items-center rounded-full ring-2 ${
                   carryoverMode === mode
-                    ? 'ring-emerald-400'
-                    : 'ring-slate-500'
+                    ? 'ring-violet-500'
+                    : 'ring-slate-300'
                 }`}
               >
                 {carryoverMode === mode && (
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
                 )}
               </span>
               <span className="flex flex-col">
-                <span className="font-medium text-slate-100">{title}</span>
-                <span className="text-xs text-slate-500">{desc}</span>
+                <span className="font-medium text-slate-700">{title}</span>
+                <span className="text-xs text-slate-400">{desc}</span>
               </span>
             </button>
           ))}
@@ -94,7 +94,7 @@ export function Settings() {
       {/* カテゴリ管理 */}
       <div className="space-y-3">
         <SectionTitle>カテゴリ管理</SectionTitle>
-        <Card className="divide-y divide-white/5">
+        <Card className="divide-y divide-violet-100">
           {categories.map((c) => (
             <div key={c} className="flex items-center gap-2 px-3 py-2">
               <input
@@ -103,14 +103,14 @@ export function Settings() {
                   const v = e.target.value.trim();
                   if (v && v !== c) renameCategory(c, v);
                 }}
-                className="flex-1 rounded-lg bg-transparent px-2 py-1.5 text-slate-100 focus:bg-slate-700/60 focus:outline-none"
+                className="flex-1 rounded-lg bg-transparent px-2 py-1.5 text-slate-700 focus:bg-violet-50 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => {
                   if (confirm(`カテゴリ「${c}」を削除しますか？`)) deleteCategory(c);
                 }}
-                className="grid h-8 w-8 place-items-center rounded-lg text-slate-500 active:bg-white/10"
+                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 active:bg-violet-100"
                 aria-label="削除"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -142,7 +142,7 @@ export function Settings() {
                 setNewCat('');
               }
             }}
-            className="shrink-0 rounded-xl bg-emerald-500 px-4 font-bold text-slate-900"
+            className="shrink-0 rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 font-bold text-white shadow-md shadow-violet-300/40"
           >
             追加
           </button>
@@ -156,14 +156,14 @@ export function Settings() {
           <button
             type="button"
             onClick={exportJson}
-            className="w-full rounded-xl bg-slate-700/60 py-3 font-semibold text-slate-100 active:bg-white/10"
+            className="w-full rounded-xl bg-violet-50 py-3 font-semibold text-violet-700 ring-1 ring-violet-200 active:bg-violet-100"
           >
             バックアップを書き出す（JSON）
           </button>
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="w-full rounded-xl bg-slate-700/60 py-3 font-semibold text-slate-100 active:bg-white/10"
+            className="w-full rounded-xl bg-violet-50 py-3 font-semibold text-violet-700 ring-1 ring-violet-200 active:bg-violet-100"
           >
             バックアップを読み込む
           </button>
@@ -189,7 +189,7 @@ export function Settings() {
                 resetData();
               }
             }}
-            className="w-full rounded-xl bg-red-500/10 py-3 font-semibold text-red-300/80 ring-1 ring-red-500/20"
+            className="w-full rounded-xl bg-rose-50 py-3 font-semibold text-rose-500 ring-1 ring-rose-200"
           >
             初期データにリセット
           </button>

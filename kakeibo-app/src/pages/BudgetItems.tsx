@@ -19,7 +19,7 @@ export function BudgetItems() {
   const prevMonths = months.filter((m) => m.id < month.id);
 
   const metaInput =
-    'w-full rounded-lg bg-slate-700/60 px-3 py-2 text-right text-slate-100 tabular-nums ring-1 ring-white/5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50';
+    'w-full rounded-lg bg-violet-50 px-3 py-2 text-right text-slate-800 tabular-nums ring-1 ring-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400';
 
   return (
     <div className="space-y-4">
@@ -28,7 +28,7 @@ export function BudgetItems() {
         <SectionTitle>月の設定</SectionTitle>
         <Card className="space-y-3 p-5">
           <label className="flex items-center justify-between gap-3">
-            <span className="text-sm text-slate-300">開始残高</span>
+            <span className="text-sm text-slate-600">開始残高</span>
             <input
               type="number"
               value={month.startBalance}
@@ -39,7 +39,7 @@ export function BudgetItems() {
             />
           </label>
           <label className="flex items-center justify-between gap-3">
-            <span className="text-sm text-slate-300">死守ライン</span>
+            <span className="text-sm text-slate-600">死守ライン</span>
             <input
               type="number"
               value={month.defenseLine}
@@ -50,7 +50,7 @@ export function BudgetItems() {
             />
           </label>
           <label className="flex items-center justify-between gap-3">
-            <span className="text-sm text-slate-300">給与想定</span>
+            <span className="text-sm text-slate-600">給与想定</span>
             <input
               type="number"
               value={month.assumedSalary}
@@ -76,34 +76,34 @@ export function BudgetItems() {
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-slate-900 active:scale-95"
+            className="rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-violet-300/40 active:scale-95"
           >
             ＋ 追加
           </button>
         </div>
 
         {month.budgetItems.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-slate-400">
+          <Card className="p-6 text-center text-sm text-slate-500">
             項目がありません。
             {prevMonths.length > 0 && '前月からコピーするか、'}
             「追加」で作成してください。
           </Card>
         ) : (
-          <Card className="divide-y divide-white/5">
+          <Card className="divide-y divide-violet-100">
             {month.budgetItems.map((i) => (
               <button
                 key={i.id}
                 type="button"
                 onClick={() => setEditing(i)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-white/5"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
               >
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate font-medium text-slate-100">{i.name}</span>
-                  <span className="text-xs text-slate-500">{i.category}</span>
+                  <span className="truncate font-medium text-slate-700">{i.name}</span>
+                  <span className="text-xs text-slate-400">{i.category}</span>
                 </div>
                 <span
                   className={`shrink-0 font-bold tabular-nums ${
-                    i.plannedAmount >= 0 ? 'text-emerald-300' : 'text-slate-100'
+                    i.plannedAmount >= 0 ? 'text-emerald-600' : 'text-slate-700'
                   }`}
                 >
                   {signedYen(i.plannedAmount)}
@@ -127,7 +127,7 @@ export function BudgetItems() {
                     copyBudgetItemsFrom(month.id, m.id);
                   }
                 }}
-                className="rounded-xl bg-slate-700/60 px-3 py-2 text-xs font-medium text-slate-200 ring-1 ring-white/5 active:bg-white/10"
+                className="rounded-xl bg-violet-100 px-3 py-2 text-xs font-medium text-violet-700 ring-1 ring-violet-200 active:bg-violet-200"
               >
                 {m.label}の項目をコピー
               </button>
@@ -144,7 +144,7 @@ export function BudgetItems() {
               deleteMonth(month.id);
             }
           }}
-          className="w-full rounded-xl bg-red-500/10 py-3 text-sm font-semibold text-red-300/80 ring-1 ring-red-500/20"
+          className="w-full rounded-xl bg-rose-50 py-3 text-sm font-semibold text-rose-500 ring-1 ring-rose-200"
         >
           この月を削除
         </button>

@@ -23,25 +23,29 @@ import { num, yen } from '../lib/format';
 import { Card, SectionTitle } from '../components/ui';
 
 const PALETTE = [
-  '#34d399',
-  '#60a5fa',
-  '#f472b6',
-  '#fbbf24',
-  '#a78bfa',
-  '#22d3ee',
-  '#fb7185',
-  '#4ade80',
-  '#facc15',
+  '#38bdf8',
   '#818cf8',
+  '#c084fc',
+  '#f0abfc',
+  '#a78bfa',
+  '#60a5fa',
+  '#e879f9',
+  '#7dd3fc',
+  '#c4b5fd',
+  '#f9a8d4',
 ];
 
 const tooltipStyle = {
-  backgroundColor: '#1e293b',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: '#ffffff',
+  border: '1px solid #ddd6fe',
   borderRadius: 12,
-  color: '#e2e8f0',
+  color: '#475569',
   fontSize: 12,
+  boxShadow: '0 6px 20px rgba(139,92,246,0.18)',
 };
+
+const GRID = 'rgba(148,163,184,0.25)';
+const AXIS = '#94a3b8';
 
 export function Charts() {
   const months = useBudgetStore((s) => s.months);
@@ -73,10 +77,10 @@ export function Charts() {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trend} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                <CartesianGrid stroke={GRID} vertical={false} />
+                <XAxis dataKey="name" stroke={AXIS} fontSize={12} tickLine={false} />
                 <YAxis
-                  stroke="#94a3b8"
+                  stroke={AXIS}
                   fontSize={11}
                   tickLine={false}
                   width={48}
@@ -90,14 +94,14 @@ export function Charts() {
                 <Line
                   type="monotone"
                   dataKey="見込み"
-                  stroke="#34d399"
+                  stroke="#8b5cf6"
                   strokeWidth={2.5}
                   dot={{ r: 3 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="実績"
-                  stroke="#60a5fa"
+                  stroke="#38bdf8"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />
@@ -119,7 +123,7 @@ export function Charts() {
         <SectionTitle>{month.label}の支出予算の内訳</SectionTitle>
         <Card className="p-4">
           {pieData.length === 0 ? (
-            <p className="py-12 text-center text-sm text-slate-400">
+            <p className="py-12 text-center text-sm text-slate-500">
               支出予算がありません。
             </p>
           ) : (
@@ -156,7 +160,7 @@ export function Charts() {
         <SectionTitle>{month.label}の予算 vs 実績</SectionTitle>
         <Card className="p-4">
           {barData.length === 0 ? (
-            <p className="py-12 text-center text-sm text-slate-400">
+            <p className="py-12 text-center text-sm text-slate-500">
               データがありません。
             </p>
           ) : (
@@ -167,17 +171,17 @@ export function Charts() {
                   layout="vertical"
                   margin={{ top: 4, right: 12, left: 8, bottom: 0 }}
                 >
-                  <CartesianGrid stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                  <CartesianGrid stroke={GRID} horizontal={false} />
                   <XAxis
                     type="number"
-                    stroke="#94a3b8"
+                    stroke={AXIS}
                     fontSize={11}
                     tickFormatter={(v) => `${Math.round(v / 10000)}万`}
                   />
                   <YAxis
                     type="category"
                     dataKey="name"
-                    stroke="#94a3b8"
+                    stroke={AXIS}
                     fontSize={11}
                     width={64}
                     tickLine={false}
@@ -185,11 +189,11 @@ export function Charts() {
                   <Tooltip
                     contentStyle={tooltipStyle}
                     formatter={(v) => `${num(Number(v))}円`}
-                    cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                    cursor={{ fill: 'rgba(139,92,246,0.06)' }}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="予算" fill="#475569" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="実績" fill="#34d399" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="予算" fill="#cbd5e1" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="実績" fill="#a78bfa" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

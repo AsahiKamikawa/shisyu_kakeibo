@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
@@ -12,8 +12,10 @@ body,
 
 body {
   margin: 0;
-  background-color: #0f172a;
-  color: #e2e8f0;
+  color: #334155;
+  background: linear-gradient(160deg, #d6ecff 0%, #e7e0ff 48%, #f7e3ff 100%);
+  background-attachment: fixed;
+  min-height: 100%;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans',
     'Yu Gothic', Meiryo, system-ui, sans-serif;
@@ -37,4 +39,12 @@ input[type='number']::-webkit-inner-spin-button {
 }
 input[type='number'] {
   -moz-appearance: textfield;
+}
+
+/* グラデのテキスト見出しなどに使う */
+.text-gradient {
+  background-image: linear-gradient(90deg, #38bdf8, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

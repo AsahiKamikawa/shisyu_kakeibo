@@ -11,7 +11,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl bg-slate-800/70 ring-1 ring-white/5 shadow-lg shadow-black/20 ${className}`}
+      className={`rounded-3xl bg-white/80 ring-1 ring-violet-200/60 shadow-lg shadow-violet-300/20 backdrop-blur ${className}`}
     >
       {children}
     </div>
@@ -20,7 +20,7 @@ export function Card({
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="px-1 text-sm font-semibold tracking-wide text-slate-400">
+    <h2 className="px-1 text-sm font-bold tracking-wide text-violet-500">
       {children}
     </h2>
   );
@@ -32,12 +32,12 @@ export function JudgmentBadge({ value }: { value: Judgment }) {
     <span
       className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold ${
         ok
-          ? 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
-          : 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30'
+          ? 'bg-emerald-100 text-emerald-600 ring-1 ring-emerald-300/70'
+          : 'bg-rose-100 text-rose-500 ring-1 ring-rose-300/70'
       }`}
     >
       <span
-        className={`h-2 w-2 rounded-full ${ok ? 'bg-emerald-400' : 'bg-red-400'}`}
+        className={`h-2 w-2 rounded-full ${ok ? 'bg-emerald-500' : 'bg-rose-500'}`}
       />
       {ok ? '死守OK' : '危険'}
     </span>
@@ -61,29 +61,29 @@ export function RemainingBar({
   const over = remaining < 0;
   const near = !over && ratio >= 0.8;
   const barColor = over
-    ? 'bg-red-500'
+    ? 'bg-rose-400'
     : near
       ? 'bg-amber-400'
-      : 'bg-emerald-400';
+      : 'bg-gradient-to-r from-sky-400 to-violet-500';
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-sm font-medium text-slate-200">{label}</span>
+        <span className="text-sm font-medium text-slate-700">{label}</span>
         <span
           className={`text-sm font-semibold tabular-nums ${
-            over ? 'text-red-300' : 'text-slate-300'
+            over ? 'text-rose-500' : 'text-slate-600'
           }`}
         >
           {over ? `${yen(-remaining)} 超過` : `残り ${yen(remaining)}`}
         </span>
       </div>
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-700/60">
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-violet-100">
         <div
           className={`h-full rounded-full ${barColor} transition-all`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className="flex justify-between text-xs text-slate-500 tabular-nums">
+      <div className="flex justify-between text-xs text-slate-400 tabular-nums">
         <span>使った {yen(spent)}</span>
         <span>予算 {yen(budget)}</span>
       </div>
@@ -102,10 +102,10 @@ export function Stat({
 }) {
   const color =
     accent === 'good'
-      ? 'text-emerald-300'
+      ? 'text-emerald-600'
       : accent === 'bad'
-        ? 'text-red-300'
-        : 'text-slate-100';
+        ? 'text-rose-500'
+        : 'text-slate-700';
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-xs text-slate-400">{label}</span>

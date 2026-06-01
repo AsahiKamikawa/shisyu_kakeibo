@@ -22,7 +22,7 @@ export function MonthSwitcher() {
         aria-label="前の月"
         disabled={idx <= 0}
         onClick={() => go(-1)}
-        className="grid h-9 w-9 place-items-center rounded-full text-slate-300 disabled:opacity-30 active:bg-white/10"
+        className="grid h-9 w-9 place-items-center rounded-full text-violet-500 disabled:opacity-30 active:bg-violet-100"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
@@ -38,10 +38,10 @@ export function MonthSwitcher() {
       <select
         value={currentMonthId}
         onChange={(e) => setCurrentMonth(e.target.value)}
-        className="appearance-none rounded-lg bg-transparent px-2 py-1 text-center text-base font-bold text-slate-100 focus:outline-none"
+        className="appearance-none rounded-lg bg-transparent px-2 py-1 text-center text-base font-bold text-slate-700 focus:outline-none"
       >
         {months.map((m) => (
-          <option key={m.id} value={m.id} className="bg-slate-800">
+          <option key={m.id} value={m.id} className="bg-white text-slate-700">
             {monthTitle(m.id)}
           </option>
         ))}
@@ -52,7 +52,7 @@ export function MonthSwitcher() {
           type="button"
           aria-label="翌月を追加"
           onClick={() => createMonth(currentMonthId)}
-          className="grid h-9 w-9 place-items-center rounded-full text-emerald-300 active:bg-white/10"
+          className="grid h-9 w-9 place-items-center rounded-full text-violet-600 active:bg-violet-100"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path
@@ -68,7 +68,7 @@ export function MonthSwitcher() {
           type="button"
           aria-label="次の月"
           onClick={() => go(1)}
-          className="grid h-9 w-9 place-items-center rounded-full text-slate-300 active:bg-white/10"
+          className="grid h-9 w-9 place-items-center rounded-full text-violet-500 active:bg-violet-100"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path

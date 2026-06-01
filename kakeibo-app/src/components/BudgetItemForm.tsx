@@ -51,19 +51,19 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
   };
 
   const inputCls =
-    'w-full rounded-xl bg-slate-700/60 px-3 py-2.5 text-slate-100 ring-1 ring-white/5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50';
+    'w-full rounded-xl bg-violet-50 px-3 py-2.5 text-slate-800 ring-1 ring-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400';
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-violet-950/30 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="safe-bottom w-full max-w-md rounded-t-3xl bg-slate-800 p-5 ring-1 ring-white/10"
+        className="safe-bottom w-full max-w-md rounded-t-3xl bg-white p-5 ring-1 ring-violet-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-600" />
-        <h2 className="mb-4 text-lg font-bold text-slate-100">
+        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-300" />
+        <h2 className="mb-4 text-lg font-bold text-slate-800">
           {editing ? '予算項目を編集' : '予算項目を追加'}
         </h2>
 
@@ -73,8 +73,8 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
             onClick={() => setKind('expense')}
             className={`rounded-xl py-2.5 text-sm font-bold transition ${
               kind === 'expense'
-                ? 'bg-red-500/20 text-red-200 ring-1 ring-red-500/40'
-                : 'bg-slate-700/40 text-slate-400'
+                ? 'bg-rose-100 text-rose-600 ring-1 ring-rose-300'
+                : 'bg-slate-100 text-slate-400'
             }`}
           >
             支出
@@ -84,8 +84,8 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
             onClick={() => setKind('income')}
             className={`rounded-xl py-2.5 text-sm font-bold transition ${
               kind === 'income'
-                ? 'bg-emerald-500/20 text-emerald-200 ring-1 ring-emerald-500/40'
-                : 'bg-slate-700/40 text-slate-400'
+                ? 'bg-emerald-100 text-emerald-600 ring-1 ring-emerald-300'
+                : 'bg-slate-100 text-slate-400'
             }`}
           >
             収入
@@ -94,7 +94,7 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
 
         <div className="mt-3 space-y-3">
           <div>
-            <label className="mb-1 block text-xs text-slate-400">項目名</label>
+            <label className="mb-1 block text-xs text-slate-500">項目名</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -104,11 +104,11 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-400">
+            <label className="mb-1 block text-xs text-slate-500">
               {kind === 'income' ? '見込み金額' : '月額予算'}
             </label>
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
                 ¥
               </span>
               <input
@@ -122,7 +122,7 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-400">カテゴリ</label>
+            <label className="mb-1 block text-xs text-slate-500">カテゴリ</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -136,7 +136,7 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-400">メモ</label>
+            <label className="mb-1 block text-xs text-slate-500">メモ</label>
             <input
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
@@ -151,7 +151,7 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
             <button
               type="button"
               onClick={remove}
-              className="rounded-xl bg-red-500/15 px-4 py-3 font-semibold text-red-300 ring-1 ring-red-500/30"
+              className="rounded-xl bg-rose-100 px-4 py-3 font-semibold text-rose-500 ring-1 ring-rose-200"
             >
               削除
             </button>
@@ -159,14 +159,14 @@ export function BudgetItemForm({ monthId, initial, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-xl bg-slate-700/60 px-4 py-3 font-semibold text-slate-200"
+            className="flex-1 rounded-xl bg-slate-100 px-4 py-3 font-semibold text-slate-600"
           >
             キャンセル
           </button>
           <button
             type="button"
             onClick={save}
-            className="flex-1 rounded-xl bg-emerald-500 px-4 py-3 font-bold text-slate-900"
+            className="flex-1 rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 py-3 font-bold text-white shadow-md shadow-violet-300/40"
           >
             保存
           </button>

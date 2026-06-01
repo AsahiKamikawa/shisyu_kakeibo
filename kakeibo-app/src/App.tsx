@@ -21,13 +21,13 @@ export default function App() {
 
   return (
     <div className="mx-auto flex min-h-full max-w-md flex-col">
-      <header className="safe-top sticky top-0 z-10 border-b border-white/5 bg-slate-900/80 backdrop-blur">
+      <header className="safe-top sticky top-0 z-10 border-b border-violet-200/60 bg-white/70 backdrop-blur">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex flex-col">
-            <span className="text-[11px] font-medium tracking-wide text-emerald-400">
+            <span className="text-gradient text-[11px] font-bold tracking-wide">
               絶対死守 家計簿
             </span>
-            <span className="text-base font-bold text-slate-100">{titles[tab]}</span>
+            <span className="text-base font-bold text-slate-700">{titles[tab]}</span>
           </div>
           <MonthSwitcher />
         </div>

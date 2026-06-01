@@ -85,7 +85,7 @@ export function TabBar({
   onChange: (id: TabId) => void;
 }) {
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-white/5 bg-slate-900/90 backdrop-blur">
+    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-violet-200/60 bg-white/85 backdrop-blur">
       <div className="mx-auto flex max-w-md items-stretch justify-around px-2 py-1.5">
         {order.map((id) => {
           const isActive = id === active;
@@ -95,7 +95,7 @@ export function TabBar({
               type="button"
               onClick={() => onChange(id)}
               className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-[11px] font-medium transition-colors ${
-                isActive ? 'text-emerald-300' : 'text-slate-400'
+                isActive ? 'text-violet-600' : 'text-slate-400'
               }`}
             >
               <svg width="24" height="24" viewBox="0 0 24 24">

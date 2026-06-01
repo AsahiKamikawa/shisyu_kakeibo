@@ -33,22 +33,22 @@ export function Dashboard() {
         <div
           className={`p-5 ${
             verdict === 'OK'
-              ? 'bg-gradient-to-br from-emerald-500/15 to-transparent'
-              : 'bg-gradient-to-br from-red-500/20 to-transparent'
+              ? 'bg-gradient-to-br from-sky-200/70 via-violet-100/60 to-transparent'
+              : 'bg-gradient-to-br from-rose-200/70 via-pink-100/50 to-transparent'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-300">月末残高見込み</span>
+            <span className="text-sm font-medium text-slate-500">月末残高見込み</span>
             <JudgmentBadge value={verdict} />
           </div>
-          <div className="mt-1 text-4xl font-extrabold tabular-nums text-white">
+          <div className="text-gradient mt-1 text-4xl font-extrabold tabular-nums">
             {yen(projected)}
           </div>
-          <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3 text-sm">
-            <span className="text-slate-400">死守ライン {yen(month.defenseLine)}</span>
+          <div className="mt-3 flex items-center justify-between border-t border-violet-200/70 pt-3 text-sm">
+            <span className="text-slate-500">死守ライン {yen(month.defenseLine)}</span>
             <span
               className={`font-semibold tabular-nums ${
-                diff >= 0 ? 'text-emerald-300' : 'text-red-300'
+                diff >= 0 ? 'text-emerald-600' : 'text-rose-500'
               }`}
             >
               {diff >= 0 ? `余裕 ${yen(diff)}` : `不足 ${yen(-diff)}`}
@@ -61,10 +61,10 @@ export function Dashboard() {
       <Card className="p-5">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-sm text-slate-400">今月あと使える（予算ベース）</div>
+            <div className="text-sm text-slate-500">今月あと使える（予算ベース）</div>
             <div
               className={`mt-1 text-3xl font-bold tabular-nums ${
-                canSpend < 0 ? 'text-red-300' : 'text-emerald-300'
+                canSpend < 0 ? 'text-rose-500' : 'text-violet-600'
               }`}
             >
               {yen(canSpend)}
@@ -73,7 +73,7 @@ export function Dashboard() {
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-bold text-slate-900 active:scale-95"
+            className="rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-300/40 active:scale-95"
           >
             ＋ 記録する
           </button>
@@ -89,7 +89,7 @@ export function Dashboard() {
       <div className="space-y-3">
         <SectionTitle>カテゴリ別の残り（今月あと何にいくら）</SectionTitle>
         {cats.length === 0 ? (
-          <Card className="p-5 text-center text-sm text-slate-400">
+          <Card className="p-5 text-center text-sm text-slate-500">
             支出予算がまだありません。「予算」タブで項目を追加してください。
           </Card>
         ) : (

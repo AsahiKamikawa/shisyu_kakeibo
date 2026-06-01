@@ -25,46 +25,46 @@ export function Transactions() {
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-slate-900 active:scale-95"
+          className="rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-violet-300/40 active:scale-95"
         >
           ＋ 追加
         </button>
       </div>
 
       {sorted.length === 0 ? (
-        <Card className="p-8 text-center text-sm text-slate-400">
+        <Card className="p-8 text-center text-sm text-slate-500">
           まだ記録がありません。
           <br />
           右上の「追加」から収支を入力できます。
         </Card>
       ) : (
-        <Card className="divide-y divide-white/5">
+        <Card className="divide-y divide-violet-100">
           {sorted.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setEditing(t)}
-              className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-white/5"
+              className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
             >
               <div className="flex min-w-0 flex-1 flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="truncate font-medium text-slate-100">
+                  <span className="truncate font-medium text-slate-700">
                     {t.content}
                   </span>
                   {t.planActual === '予定' && (
-                    <span className="shrink-0 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
+                    <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
                       予定
                     </span>
                   )}
                 </div>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-400">
                   {t.date.slice(5).replace('-', '/')}・{t.category}
                   {t.memo ? `・${t.memo}` : ''}
                 </span>
               </div>
               <span
                 className={`shrink-0 font-bold tabular-nums ${
-                  t.amount >= 0 ? 'text-emerald-300' : 'text-slate-100'
+                  t.amount >= 0 ? 'text-emerald-600' : 'text-slate-700'
                 }`}
               >
                 {t.amount >= 0 ? `+${yen(t.amount)}` : yen(t.amount)}
