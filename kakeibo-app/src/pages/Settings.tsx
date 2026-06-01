@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useBudgetStore } from '../store/budgetStore';
 import type { BudgetData } from '../types';
 import { Card, SectionTitle } from '../components/ui';
+import { checkForUpdate } from '../lib/pwa';
 
 export function Settings() {
   const categories = useBudgetStore((s) => s.categories);
@@ -14,7 +15,18 @@ export function Settings() {
   const resetData = useBudgetStore((s) => s.resetData);
 
   const [newCat, setNewCat] = useState('');
+  const [checking, setChecking] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const onCheckUpdate = async () => {
+    setChecking(true);
+    const result = await checkForUpdate();
+    setChecking(false);
+    if (result === 'latest') {
+      alert('すでに最新の状態です。');
+    }
+    // 'updating' の場合は画面下に更新バナーが表示されます
+  };
 
   const exportJson = () => {
     const state = useBudgetStore.getState();
@@ -196,6 +208,24 @@ export function Settings() {
         </Card>
         <p className="px-1 text-xs leading-relaxed text-slate-500">
           データはこの端末のブラウザ内（ローカルストレージ）にのみ保存され、外部には送信されません。機種変更や履歴削除に備えて、ときどきバックアップを書き出してください。
+        </p>
+      </div>
+
+      {/* アプリの更新 */}
+      <div className="space-y-3">
+        <SectionTitle>アプリの更新</SectionTitle>
+        <Card className="space-y-2 p-3">
+          <button
+            type="button"
+            onClick={onCheckUpdate}
+            disabled={checking}
+            className="w-full rounded-xl bg-violet-50 py-3 font-semibold text-violet-700 ring-1 ring-violet-200 active:bg-violet-100 disabled:opacity-50"
+          >
+            {checking ? '確認中…' : '最新バージョンを確認'}
+          </button>
+        </Card>
+        <p className="px-1 text-xs leading-relaxed text-slate-500">
+          新しいバージョンがあると、画面下に「更新」バナーが表示されます。通常はアプリを開き直すと自動で確認されますが、すぐ確認したいときはこのボタンを使ってください。
         </p>
       </div>
     </div>

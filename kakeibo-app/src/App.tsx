@@ -20,8 +20,8 @@ export default function App() {
   const [tab, setTab] = useState<TabId>('home');
 
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col">
-      <header className="safe-top sticky top-0 z-10 border-b border-violet-200/60 bg-white/70 backdrop-blur">
+    <div className="mx-auto flex h-[100dvh] max-w-md flex-col overflow-hidden">
+      <header className="safe-top z-10 shrink-0 border-b border-violet-200/60 bg-white/70 backdrop-blur">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex flex-col">
             <span className="text-gradient text-[11px] font-bold tracking-wide">
@@ -33,7 +33,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 pb-28 pt-4">
+      <main className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
         {tab === 'home' && <Dashboard />}
         {tab === 'tx' && <Transactions />}
         {tab === 'budget' && <BudgetItems />}

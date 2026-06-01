@@ -85,7 +85,7 @@ export function TabBar({
   onChange: (id: TabId) => void;
 }) {
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-violet-200/60 bg-white/85 backdrop-blur">
+    <nav className="safe-bottom z-20 shrink-0 border-t border-violet-200/60 bg-white/85 backdrop-blur">
       <div className="mx-auto flex max-w-md items-stretch justify-around px-2 py-1.5">
         {order.map((id) => {
           const isActive = id === active;
