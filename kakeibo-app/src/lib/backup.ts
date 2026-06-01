@@ -10,6 +10,7 @@ export function buildBackupData(): BudgetData {
     currentMonthId: s.currentMonthId,
     carryoverMode: s.carryoverMode,
     templates: s.templates ?? [],
+    categoryColors: s.categoryColors ?? {},
   };
 }
 

@@ -61,4 +61,6 @@ export interface BudgetData {
   carryoverMode: CarryoverMode;
   /** よく使う入力テンプレート */
   templates: TxTemplate[];
+  /** カテゴリ名 -> 表示色の上書き（未設定はパレットから自動割当） */
+  categoryColors: Record<string, string>;
 }

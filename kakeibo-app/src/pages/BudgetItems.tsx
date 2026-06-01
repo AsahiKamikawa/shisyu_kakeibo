@@ -3,12 +3,14 @@ import { useBudgetStore, useCurrentMonth } from '../store/budgetStore';
 import type { BudgetItem } from '../types';
 import { signedYen, yen } from '../lib/format';
 import { plannedExpense, plannedIncome, plannedNet, projectedEndBalance } from '../lib/calc';
-import { Card, SectionTitle, Stat } from '../components/ui';
+import { colorForCategory } from '../lib/colors';
+import { Card, CategoryDot, EmptyState, SectionTitle, Stat } from '../components/ui';
 import { BudgetItemForm } from '../components/BudgetItemForm';
 
 export function BudgetItems() {
   const month = useCurrentMonth();
   const months = useBudgetStore((s) => s.months);
+  const categoryColors = useBudgetStore((s) => s.categoryColors);
   const updateMonthMeta = useBudgetStore((s) => s.updateMonthMeta);
   const copyBudgetItemsFrom = useBudgetStore((s) => s.copyBudgetItemsFrom);
   const deleteMonth = useBudgetStore((s) => s.deleteMonth);
@@ -83,13 +85,20 @@ export function BudgetItems() {
         </div>
 
         {month.budgetItems.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-slate-500">
-            項目がありません。
-            {prevMonths.length > 0 && '前月からコピーするか、'}
-            「追加」で作成してください。
+          <Card>
+            <EmptyState
+              title="予算項目がありません"
+              description={
+                prevMonths.length > 0
+                  ? '下のボタンで前月からコピーするか、項目を追加してください。'
+                  : '固定費や生活費などの項目を追加して、月の予算を作りましょう。'
+              }
+              actionLabel="＋ 項目を追加"
+              onAction={() => setAdding(true)}
+            />
           </Card>
         ) : (
-          <Card className="divide-y divide-violet-100">
+          <Card className="anim-pop divide-y divide-violet-100">
             {month.budgetItems.map((i) => (
               <button
                 key={i.id}
@@ -97,6 +106,7 @@ export function BudgetItems() {
                 onClick={() => setEditing(i)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
               >
+                <CategoryDot color={colorForCategory(i.category, categoryColors)} />
                 <div className="flex min-w-0 flex-1 flex-col">
                   <div className="flex items-center gap-2">
                     <span className="truncate font-medium text-slate-700">{i.name}</span>

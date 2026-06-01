@@ -26,11 +26,11 @@ export function BackupPrompt() {
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-violet-950/30 backdrop-blur-sm"
+      className="anim-fade fixed inset-0 z-[70] flex items-end justify-center bg-violet-950/30 backdrop-blur-sm"
       onClick={closePrompt}
     >
       <div
-        className="safe-bottom w-full max-w-md rounded-t-3xl bg-white p-5 ring-1 ring-violet-200"
+        className="anim-sheet safe-bottom w-full max-w-md rounded-t-3xl bg-white p-5 ring-1 ring-violet-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-300" />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useCurrentMonth } from '../store/budgetStore';
+import { useBudgetStore, useCurrentMonth } from '../store/budgetStore';
+import { colorForCategory } from '../lib/colors';
 import {
   actualEndBalance,
   actualExpense,
@@ -12,11 +13,20 @@ import {
   remainingToSpend,
 } from '../lib/calc';
 import { signedYen, yen } from '../lib/format';
-import { Card, JudgmentBadge, RemainingBar, SectionTitle, Stat } from '../components/ui';
+import {
+  Card,
+  CountUp,
+  EmptyState,
+  JudgmentBadge,
+  RemainingBar,
+  SectionTitle,
+  Stat,
+} from '../components/ui';
 import { TransactionForm } from '../components/TransactionForm';
 
 export function Dashboard() {
   const month = useCurrentMonth();
+  const categoryColors = useBudgetStore((s) => s.categoryColors);
   const [adding, setAdding] = useState(false);
 
   const projected = projectedEndBalance(month);
@@ -42,7 +52,7 @@ export function Dashboard() {
             <JudgmentBadge value={verdict} />
           </div>
           <div className="text-gradient mt-1 text-4xl font-extrabold tabular-nums">
-            {yen(projected)}
+            <CountUp value={projected} />
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-violet-200/70 pt-3 text-sm">
             <span className="text-slate-500">死守ライン {yen(month.defenseLine)}</span>
@@ -67,7 +77,7 @@ export function Dashboard() {
                 canSpend < 0 ? 'text-rose-500' : 'text-violet-600'
               }`}
             >
-              {yen(canSpend)}
+              <CountUp value={canSpend} />
             </div>
           </div>
           <button
@@ -89,8 +99,12 @@ export function Dashboard() {
       <div className="space-y-3">
         <SectionTitle>カテゴリ別の残り（今月あと何にいくら）</SectionTitle>
         {cats.length === 0 ? (
-          <Card className="p-5 text-center text-sm text-slate-500">
-            支出予算がまだありません。「予算」タブで項目を追加してください。
+          <Card>
+            <EmptyState
+              compact
+              title="支出予算がまだありません"
+              description="「予算」タブで項目を追加すると、カテゴリごとの残りが表示されます。"
+            />
           </Card>
         ) : (
           <Card className="space-y-4 p-5">
@@ -102,6 +116,7 @@ export function Dashboard() {
                 spent={c.spent}
                 remaining={c.remaining}
                 ratio={c.ratio}
+                color={colorForCategory(c.category, categoryColors)}
               />
             ))}
           </Card>

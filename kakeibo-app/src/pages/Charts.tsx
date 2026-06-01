@@ -20,20 +20,8 @@ import {
   projectedEndBalance,
 } from '../lib/calc';
 import { num, yen } from '../lib/format';
-import { Card, SectionTitle } from '../components/ui';
-
-const PALETTE = [
-  '#38bdf8',
-  '#818cf8',
-  '#c084fc',
-  '#f0abfc',
-  '#a78bfa',
-  '#60a5fa',
-  '#e879f9',
-  '#7dd3fc',
-  '#c4b5fd',
-  '#f9a8d4',
-];
+import { colorForCategory } from '../lib/colors';
+import { Card, ChartIcon, EmptyState, SectionTitle } from '../components/ui';
 
 const tooltipStyle = {
   backgroundColor: '#ffffff',
@@ -49,6 +37,7 @@ const AXIS = '#94a3b8';
 
 export function Charts() {
   const months = useBudgetStore((s) => s.months);
+  const categoryColors = useBudgetStore((s) => s.categoryColors);
   const month = useCurrentMonth();
 
   const trend = months.map((m) => ({
@@ -123,9 +112,7 @@ export function Charts() {
         <SectionTitle>{month.label}の支出予算の内訳</SectionTitle>
         <Card className="p-4">
           {pieData.length === 0 ? (
-            <p className="py-12 text-center text-sm text-slate-500">
-              支出予算がありません。
-            </p>
+            <EmptyState compact icon={<ChartIcon />} title="支出予算がありません" />
           ) : (
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -140,8 +127,8 @@ export function Charts() {
                     outerRadius={90}
                     paddingAngle={2}
                   >
-                    {pieData.map((_, i) => (
-                      <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
+                    {pieData.map((d, i) => (
+                      <Cell key={i} fill={colorForCategory(d.name, categoryColors)} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -160,9 +147,7 @@ export function Charts() {
         <SectionTitle>{month.label}の予算 vs 実績</SectionTitle>
         <Card className="p-4">
           {barData.length === 0 ? (
-            <p className="py-12 text-center text-sm text-slate-500">
-              データがありません。
-            </p>
+            <EmptyState compact icon={<ChartIcon />} title="データがありません" />
           ) : (
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">

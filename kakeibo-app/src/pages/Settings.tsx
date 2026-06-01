@@ -2,9 +2,10 @@ import { useRef, useState } from 'react';
 import { useBudgetStore } from '../store/budgetStore';
 import { useBackupStore } from '../store/backupStore';
 import type { BudgetData } from '../types';
-import { Card, SectionTitle } from '../components/ui';
+import { Card, CategoryDot, SectionTitle } from '../components/ui';
 import { checkForUpdate } from '../lib/pwa';
 import { shareOrDownloadBackup } from '../lib/backup';
+import { CATEGORY_PALETTE, colorForCategory } from '../lib/colors';
 
 export function Settings() {
   const categories = useBudgetStore((s) => s.categories);
@@ -17,6 +18,8 @@ export function Settings() {
   const resetData = useBudgetStore((s) => s.resetData);
   const templates = useBudgetStore((s) => s.templates);
   const deleteTemplate = useBudgetStore((s) => s.deleteTemplate);
+  const categoryColors = useBudgetStore((s) => s.categoryColors);
+  const setCategoryColor = useBudgetStore((s) => s.setCategoryColor);
 
   const lastBackupAt = useBackupStore((s) => s.lastBackupAt);
   const pendingChanges = useBackupStore((s) => s.pendingChanges);
@@ -27,6 +30,7 @@ export function Settings() {
   const [newCat, setNewCat] = useState('');
   const [checking, setChecking] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [colorEditing, setColorEditing] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const onCheckUpdate = async () => {
@@ -118,33 +122,70 @@ export function Settings() {
         <SectionTitle>カテゴリ管理</SectionTitle>
         <Card className="divide-y divide-violet-100">
           {categories.map((c) => (
-            <div key={c} className="flex items-center gap-2 px-3 py-2">
-              <input
-                defaultValue={c}
-                onBlur={(e) => {
-                  const v = e.target.value.trim();
-                  if (v && v !== c) renameCategory(c, v);
-                }}
-                className="flex-1 rounded-lg bg-transparent px-2 py-1.5 text-slate-700 focus:bg-violet-50 focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm(`カテゴリ「${c}」を削除しますか？`)) deleteCategory(c);
-                }}
-                className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 active:bg-violet-100"
-                aria-label="削除"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 7h12M9 7V5h6v2M10 11v6M14 11v6M7 7l1 13h8l1-13"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+            <div key={c} className="px-3 py-2">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setColorEditing((prev) => (prev === c ? null : c))
+                  }
+                  className="grid h-8 w-8 place-items-center rounded-lg active:bg-violet-100"
+                  aria-label="色を変更"
+                >
+                  <CategoryDot
+                    color={colorForCategory(c, categoryColors)}
+                    className="h-4 w-4"
                   />
-                </svg>
-              </button>
+                </button>
+                <input
+                  defaultValue={c}
+                  onBlur={(e) => {
+                    const v = e.target.value.trim();
+                    if (v && v !== c) renameCategory(c, v);
+                  }}
+                  className="flex-1 rounded-lg bg-transparent px-2 py-1.5 text-slate-700 focus:bg-violet-50 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`カテゴリ「${c}」を削除しますか？`)) deleteCategory(c);
+                  }}
+                  className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 active:bg-violet-100"
+                  aria-label="削除"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M6 7h12M9 7V5h6v2M10 11v6M14 11v6M7 7l1 13h8l1-13"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+              {colorEditing === c && (
+                <div className="anim-fade mt-1 flex flex-wrap gap-2 px-1 pb-2 pl-10">
+                  {CATEGORY_PALETTE.map((color) => {
+                    const active = colorForCategory(c, categoryColors) === color;
+                    return (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => {
+                          setCategoryColor(c, color);
+                          setColorEditing(null);
+                        }}
+                        className={`h-7 w-7 rounded-full ring-2 transition ${
+                          active ? 'ring-slate-400' : 'ring-transparent'
+                        }`}
+                        style={{ backgroundColor: color }}
+                        aria-label={`色 ${color}`}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ))}
         </Card>

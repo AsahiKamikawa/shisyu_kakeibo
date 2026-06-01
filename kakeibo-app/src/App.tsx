@@ -78,11 +78,13 @@ export default function App() {
       )}
 
       <main className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6 pt-4">
-        {tab === 'home' && <Dashboard />}
-        {tab === 'tx' && <Transactions />}
-        {tab === 'budget' && <BudgetItems />}
-        {tab === 'charts' && <Charts />}
-        {tab === 'settings' && <Settings />}
+        <div key={tab} className="anim-fade">
+          {tab === 'home' && <Dashboard />}
+          {tab === 'tx' && <Transactions />}
+          {tab === 'budget' && <BudgetItems />}
+          {tab === 'charts' && <Charts />}
+          {tab === 'settings' && <Settings />}
+        </div>
       </main>
 
       <TabBar active={tab} onChange={setTab} />

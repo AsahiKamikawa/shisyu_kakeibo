@@ -40,6 +40,7 @@ interface BudgetState extends BudgetData {
   addCategory: (name: string) => void;
   renameCategory: (oldName: string, newName: string) => void;
   deleteCategory: (name: string) => void;
+  setCategoryColor: (name: string, color: string) => void;
 
   addTemplate: (t: Omit<TxTemplate, 'id'>) => void;
   deleteTemplate: (id: string) => void;
@@ -190,21 +191,41 @@ export const useBudgetStore = create<BudgetState>()(
         ),
 
       renameCategory: (oldName, newName) =>
-        set((s) => ({
-          categories: s.categories.map((c) => (c === oldName ? newName : c)),
-          months: s.months.map((m) => ({
-            ...m,
-            budgetItems: m.budgetItems.map((i) =>
-              i.category === oldName ? { ...i, category: newName } : i,
-            ),
-            transactions: m.transactions.map((t) =>
-              t.category === oldName ? { ...t, category: newName } : t,
-            ),
-          })),
-        })),
+        set((s) => {
+          const categoryColors = { ...s.categoryColors };
+          if (categoryColors[oldName]) {
+            categoryColors[newName] = categoryColors[oldName];
+            delete categoryColors[oldName];
+          }
+          return {
+            categories: s.categories.map((c) => (c === oldName ? newName : c)),
+            categoryColors,
+            months: s.months.map((m) => ({
+              ...m,
+              budgetItems: m.budgetItems.map((i) =>
+                i.category === oldName ? { ...i, category: newName } : i,
+              ),
+              transactions: m.transactions.map((t) =>
+                t.category === oldName ? { ...t, category: newName } : t,
+              ),
+            })),
+          };
+        }),
 
       deleteCategory: (name) =>
-        set((s) => ({ categories: s.categories.filter((c) => c !== name) })),
+        set((s) => {
+          const categoryColors = { ...s.categoryColors };
+          delete categoryColors[name];
+          return {
+            categories: s.categories.filter((c) => c !== name),
+            categoryColors,
+          };
+        }),
+
+      setCategoryColor: (name, color) =>
+        set((s) => ({
+          categoryColors: { ...s.categoryColors, [name]: color },
+        })),
 
       addTemplate: (t) =>
         set((s) => ({ templates: [...s.templates, { ...t, id: uid() }] })),
@@ -219,17 +240,21 @@ export const useBudgetStore = create<BudgetState>()(
           currentMonthId: data.currentMonthId,
           carryoverMode: data.carryoverMode,
           templates: data.templates ?? [],
+          categoryColors: data.categoryColors ?? {},
         })),
 
       resetData: () => set(() => ({ ...createSeedData() })),
     }),
     {
       name: 'kakeibo-budget-data',
-      version: 2,
+      version: 3,
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Partial<BudgetData>;
         if (version < 2 && !Array.isArray(state.templates)) {
           state.templates = [];
+        }
+        if (version < 3 && typeof state.categoryColors !== 'object') {
+          state.categoryColors = {};
         }
         return state as BudgetData;
       },

@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { useCurrentMonth } from '../store/budgetStore';
+import { useBudgetStore, useCurrentMonth } from '../store/budgetStore';
 import type { PlanActual, Transaction } from '../types';
 import { yen } from '../lib/format';
-import { Card, SectionTitle } from '../components/ui';
+import { colorForCategory } from '../lib/colors';
+import { Card, CategoryDot, EmptyState, SectionTitle } from '../components/ui';
 import { TransactionForm } from '../components/TransactionForm';
 
 type KindFilter = 'all' | 'expense' | 'income';
@@ -18,6 +19,7 @@ const chip = (active: boolean): string =>
 
 export function Transactions() {
   const month = useCurrentMonth();
+  const categoryColors = useBudgetStore((s) => s.categoryColors);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Transaction | null>(null);
 
@@ -139,17 +141,20 @@ export function Transactions() {
       )}
 
       {total === 0 ? (
-        <Card className="p-8 text-center text-sm text-slate-500">
-          まだ記録がありません。
-          <br />
-          右上の「追加」から収支を入力できます。
+        <Card>
+          <EmptyState
+            title="まだ記録がありません"
+            description="収入や支出を記録して、今月あといくら使えるかを管理しましょう。"
+            actionLabel="＋ 最初の記録を追加"
+            onAction={() => setAdding(true)}
+          />
         </Card>
       ) : filtered.length === 0 ? (
         <Card className="p-8 text-center text-sm text-slate-500">
           条件に合う記録がありません。
         </Card>
       ) : (
-        <Card className="divide-y divide-violet-100">
+        <Card className="anim-pop divide-y divide-violet-100">
           {filtered.map((t) => (
             <button
               key={t.id}
@@ -157,6 +162,7 @@ export function Transactions() {
               onClick={() => setEditing(t)}
               className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
             >
+              <CategoryDot color={colorForCategory(t.category, categoryColors)} />
               <div className="flex min-w-0 flex-1 flex-col">
                 <div className="flex items-center gap-2">
                   <span className="truncate font-medium text-slate-700">

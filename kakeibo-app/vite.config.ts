@@ -47,6 +47,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // iOS スプラッシュは起動時にしか使わず容量が大きいため、事前キャッシュから除外
+        globIgnores: ['**/splash-*.png'],
       },
     }),
   ],

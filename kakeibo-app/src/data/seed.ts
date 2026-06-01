@@ -32,6 +32,7 @@ export const createSeedData = (): BudgetData => ({
   currentMonthId: '2026-06',
   carryoverMode: 'projected',
   templates: [],
+  categoryColors: {},
   months: [
     {
       id: '2026-06',
