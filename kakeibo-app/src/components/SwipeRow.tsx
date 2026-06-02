@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from 'react';
 
 const ACTION_W = 88;
 
@@ -22,7 +22,7 @@ export function SwipeRow({
   const draggingRef = useRef(false);
   const moved = useRef(false);
 
-  const onTouchStart = (e: React.TouchEvent) => {
+  const onTouchStart = (e: TouchEvent) => {
     startX.current = e.touches[0].clientX;
     startTranslate.current = x;
     draggingRef.current = true;
@@ -30,7 +30,7 @@ export function SwipeRow({
     setDragging(true);
   };
 
-  const onTouchMove = (e: React.TouchEvent) => {
+  const onTouchMove = (e: TouchEvent) => {
     if (!draggingRef.current) return;
     const delta = e.touches[0].clientX - startX.current;
     if (Math.abs(delta) > 6) moved.current = true;
@@ -48,7 +48,7 @@ export function SwipeRow({
 
   // スワイプ中・開いている状態でのタップは、内側のボタン（編集）に伝えず
   // 行を閉じる動作にする
-  const onClickCapture = (e: React.MouseEvent) => {
+  const onClickCapture = (e: MouseEvent) => {
     if (moved.current || open) {
       e.preventDefault();
       e.stopPropagation();
