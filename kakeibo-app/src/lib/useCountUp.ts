@@ -16,6 +16,8 @@ export function useCountUp(value: number, durationMs = 600): number {
 
   useEffect(() => {
     if (prefersReducedMotion() || durationMs <= 0) {
+      // アニメ無効時は確定値を即反映する（意図的な同期更新）
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplay(value);
       fromRef.current = value;
       return;

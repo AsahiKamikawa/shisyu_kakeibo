@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { TabBar, type TabId } from './components/TabBar';
 import { MonthSwitcher } from './components/MonthSwitcher';
 import { UpdatePrompt } from './components/UpdatePrompt';
@@ -7,8 +7,12 @@ import { useBackupStore } from './store/backupStore';
 import { Dashboard } from './pages/Dashboard';
 import { Transactions } from './pages/Transactions';
 import { BudgetItems } from './pages/BudgetItems';
-import { Charts } from './pages/Charts';
 import { Settings } from './pages/Settings';
+
+// グラフ（recharts）は重いので遅延読み込みして初回表示を軽くする
+const Charts = lazy(() =>
+  import('./pages/Charts').then((m) => ({ default: m.Charts })),
+);
 
 const BACKUP_REMINDER_DAYS = 7;
 
@@ -22,18 +26,17 @@ const titles: Record<TabId, string> = {
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('home');
-  const [showReminder, setShowReminder] = useState(false);
-  const openPrompt = useBackupStore((s) => s.openPrompt);
-
-  useEffect(() => {
+  // 起動時点のバックアップ状況からリマインダー要否を一度だけ判定する
+  const [showReminder, setShowReminder] = useState(() => {
     const { pendingChanges, lastBackupAt } = useBackupStore.getState();
     const stale =
       lastBackupAt === null
         ? pendingChanges > 0
         : Date.now() - new Date(lastBackupAt).getTime() >
           BACKUP_REMINDER_DAYS * 24 * 60 * 60 * 1000;
-    if (pendingChanges > 0 && stale) setShowReminder(true);
-  }, []);
+    return pendingChanges > 0 && stale;
+  });
+  const openPrompt = useBackupStore((s) => s.openPrompt);
 
   return (
     <div className="app-shell mx-auto flex max-w-md flex-col overflow-hidden">
@@ -82,7 +85,17 @@ export default function App() {
           {tab === 'home' && <Dashboard />}
           {tab === 'tx' && <Transactions />}
           {tab === 'budget' && <BudgetItems />}
-          {tab === 'charts' && <Charts />}
+          {tab === 'charts' && (
+            <Suspense
+              fallback={
+                <div className="py-16 text-center text-sm text-slate-400">
+                  グラフを読み込み中…
+                </div>
+              }
+            >
+              <Charts />
+            </Suspense>
+          )}
           {tab === 'settings' && <Settings />}
         </div>
       </main>

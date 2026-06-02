@@ -6,6 +6,7 @@ import { plannedExpense, plannedIncome, plannedNet, projectedEndBalance } from '
 import { colorForCategory } from '../lib/colors';
 import { Card, CategoryDot, EmptyState, SectionTitle, Stat } from '../components/ui';
 import { BudgetItemForm } from '../components/BudgetItemForm';
+import { SortableList } from '../components/SortableList';
 
 export function BudgetItems() {
   const month = useCurrentMonth();
@@ -13,6 +14,7 @@ export function BudgetItems() {
   const categoryColors = useBudgetStore((s) => s.categoryColors);
   const updateMonthMeta = useBudgetStore((s) => s.updateMonthMeta);
   const copyBudgetItemsFrom = useBudgetStore((s) => s.copyBudgetItemsFrom);
+  const reorderBudgetItems = useBudgetStore((s) => s.reorderBudgetItems);
   const deleteMonth = useBudgetStore((s) => s.deleteMonth);
 
   const [adding, setAdding] = useState(false);
@@ -99,34 +101,43 @@ export function BudgetItems() {
           </Card>
         ) : (
           <Card className="anim-pop divide-y divide-violet-100">
-            {month.budgetItems.map((i) => (
-              <button
-                key={i.id}
-                type="button"
-                onClick={() => setEditing(i)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
-              >
-                <CategoryDot color={colorForCategory(i.category, categoryColors)} />
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate font-medium text-slate-700">{i.name}</span>
-                    {i.recurring && (
-                      <span className="shrink-0 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-600">
-                        毎月
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-slate-400">{i.category}</span>
+            <SortableList
+              items={month.budgetItems}
+              getId={(i) => i.id}
+              onReorder={(ids) => reorderBudgetItems(month.id, ids)}
+              renderRow={(i, handle) => (
+                <div className="flex items-center gap-1 px-2 py-1">
+                  {handle}
+                  <button
+                    type="button"
+                    onClick={() => setEditing(i)}
+                    className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-2 text-left active:bg-violet-50"
+                  >
+                    <CategoryDot color={colorForCategory(i.category, categoryColors)} />
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate font-medium text-slate-700">
+                          {i.name}
+                        </span>
+                        {i.recurring && (
+                          <span className="shrink-0 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-600">
+                            毎月
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-400">{i.category}</span>
+                    </div>
+                    <span
+                      className={`shrink-0 font-bold tabular-nums ${
+                        i.plannedAmount >= 0 ? 'text-emerald-600' : 'text-slate-700'
+                      }`}
+                    >
+                      {signedYen(i.plannedAmount)}
+                    </span>
+                  </button>
                 </div>
-                <span
-                  className={`shrink-0 font-bold tabular-nums ${
-                    i.plannedAmount >= 0 ? 'text-emerald-600' : 'text-slate-700'
-                  }`}
-                >
-                  {signedYen(i.plannedAmount)}
-                </span>
-              </button>
-            ))}
+              )}
+            />
           </Card>
         )}
 

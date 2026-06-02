@@ -9,7 +9,11 @@ import type {
   TxTemplate,
 } from '../types';
 import { createSeedData } from '../data/seed';
-import { projectedEndBalance, actualEndBalance } from '../lib/calc';
+import {
+  projectedEndBalance,
+  actualEndBalance,
+  buildRecurringTransactions,
+} from '../lib/calc';
 import { monthLabel, nextMonthId } from '../lib/format';
 
 const uid = (): string =>
@@ -28,6 +32,7 @@ interface BudgetState extends BudgetData {
   addBudgetItem: (monthId: string, item: Omit<BudgetItem, 'id'>) => void;
   updateBudgetItem: (monthId: string, item: BudgetItem) => void;
   deleteBudgetItem: (monthId: string, itemId: string) => void;
+  reorderBudgetItems: (monthId: string, orderedIds: string[]) => void;
 
   updateMonthMeta: (
     monthId: string,
@@ -41,6 +46,7 @@ interface BudgetState extends BudgetData {
   renameCategory: (oldName: string, newName: string) => void;
   deleteCategory: (name: string) => void;
   setCategoryColor: (name: string, color: string) => void;
+  reorderCategories: (orderedNames: string[]) => void;
 
   addTemplate: (t: Omit<TxTemplate, 'id'>) => void;
   deleteTemplate: (id: string) => void;
@@ -111,6 +117,19 @@ export const useBudgetStore = create<BudgetState>()(
           })),
         })),
 
+      reorderBudgetItems: (monthId, orderedIds) =>
+        set((s) => ({
+          months: updateMonth(s.months, monthId, (m) => {
+            const byId = new Map(m.budgetItems.map((i) => [i.id, i]));
+            const reordered = orderedIds
+              .map((id) => byId.get(id))
+              .filter((i): i is BudgetItem => i !== undefined);
+            // 念のため、orderedIds に含まれない項目は末尾に温存
+            const rest = m.budgetItems.filter((i) => !orderedIds.includes(i.id));
+            return { ...m, budgetItems: [...reordered, ...rest] };
+          }),
+        })),
+
       updateMonthMeta: (monthId, patch) =>
         set((s) => ({
           months: updateMonth(s.months, monthId, (m) => ({ ...m, ...patch })),
@@ -135,17 +154,7 @@ export const useBudgetStore = create<BudgetState>()(
           ? source.budgetItems.map((i) => ({ ...i, id: uid() }))
           : [];
         // 固定費（recurring）は「予定」取引として毎月1日に自動計上する
-        const autoTx: Transaction[] = newItems
-          .filter((i) => i.recurring && i.plannedAmount !== 0)
-          .map((i) => ({
-            id: uid(),
-            date: `${newId}-01`,
-            content: i.name,
-            category: i.category,
-            itemId: i.id,
-            amount: i.plannedAmount,
-            planActual: '予定',
-          }));
+        const autoTx = buildRecurringTransactions(newItems, newId, uid);
         const newMonth: Month = {
           id: newId,
           label: monthLabel(newId),
@@ -227,6 +236,14 @@ export const useBudgetStore = create<BudgetState>()(
           categoryColors: { ...s.categoryColors, [name]: color },
         })),
 
+      reorderCategories: (orderedNames) =>
+        set((s) => {
+          const set0 = new Set(s.categories);
+          const reordered = orderedNames.filter((n) => set0.has(n));
+          const rest = s.categories.filter((c) => !orderedNames.includes(c));
+          return { categories: [...reordered, ...rest] };
+        }),
+
       addTemplate: (t) =>
         set((s) => ({ templates: [...s.templates, { ...t, id: uid() }] })),
 
@@ -250,10 +267,16 @@ export const useBudgetStore = create<BudgetState>()(
       version: 3,
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Partial<BudgetData>;
+        // v1 -> v2: テンプレート機能の追加
         if (version < 2 && !Array.isArray(state.templates)) {
           state.templates = [];
         }
-        if (version < 3 && typeof state.categoryColors !== 'object') {
+        // v2 -> v3: カテゴリ色分けの追加
+        if (
+          version < 3 &&
+          (typeof state.categoryColors !== 'object' ||
+            state.categoryColors === null)
+        ) {
           state.categoryColors = {};
         }
         return state as BudgetData;

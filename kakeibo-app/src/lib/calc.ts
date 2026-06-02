@@ -1,4 +1,4 @@
-import type { Month } from '../types';
+import type { BudgetItem, Month, Transaction } from '../types';
 
 export type Judgment = 'OK' | '危険';
 
@@ -128,3 +128,24 @@ export const expenseItemSummary = (m: Month): ItemSummary[] => {
 /** 今月あと使える総額（支出予算 - 実績支出） */
 export const remainingToSpend = (m: Month): number =>
   -plannedExpense(m) - -actualExpense(m);
+
+/**
+ * 固定費（recurring）の予算項目から、毎月1日付の「予定」取引を生成する。
+ * 金額0の項目は除外。itemId は渡された項目の id を参照する。
+ */
+export const buildRecurringTransactions = (
+  items: BudgetItem[],
+  monthId: string,
+  makeId: () => string,
+): Transaction[] =>
+  items
+    .filter((i) => i.recurring && i.plannedAmount !== 0)
+    .map((i) => ({
+      id: makeId(),
+      date: `${monthId}-01`,
+      content: i.name,
+      category: i.category,
+      itemId: i.id,
+      amount: i.plannedAmount,
+      planActual: '予定' as const,
+    }));

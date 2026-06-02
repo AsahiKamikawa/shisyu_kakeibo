@@ -5,6 +5,7 @@ import { yen } from '../lib/format';
 import { colorForCategory } from '../lib/colors';
 import { Card, CategoryDot, EmptyState, SectionTitle } from '../components/ui';
 import { TransactionForm } from '../components/TransactionForm';
+import { SwipeRow } from '../components/SwipeRow';
 
 type KindFilter = 'all' | 'expense' | 'income';
 type StateFilter = 'all' | PlanActual;
@@ -20,6 +21,7 @@ const chip = (active: boolean): string =>
 export function Transactions() {
   const month = useCurrentMonth();
   const categoryColors = useBudgetStore((s) => s.categoryColors);
+  const deleteTransaction = useBudgetStore((s) => s.deleteTransaction);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Transaction | null>(null);
 
@@ -156,37 +158,41 @@ export function Transactions() {
       ) : (
         <Card className="anim-pop divide-y divide-violet-100">
           {filtered.map((t) => (
-            <button
+            <SwipeRow
               key={t.id}
-              type="button"
-              onClick={() => setEditing(t)}
-              className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
+              onDelete={() => deleteTransaction(month.id, t.id)}
             >
-              <CategoryDot color={colorForCategory(t.category, categoryColors)} />
-              <div className="flex min-w-0 flex-1 flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="truncate font-medium text-slate-700">
-                    {t.content}
-                  </span>
-                  {t.planActual === '予定' && (
-                    <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
-                      予定
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs text-slate-400">
-                  {t.date.slice(5).replace('-', '/')}・{t.category}
-                  {t.memo ? `・${t.memo}` : ''}
-                </span>
-              </div>
-              <span
-                className={`shrink-0 font-bold tabular-nums ${
-                  t.amount >= 0 ? 'text-emerald-600' : 'text-slate-700'
-                }`}
+              <button
+                type="button"
+                onClick={() => setEditing(t)}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-violet-50"
               >
-                {t.amount >= 0 ? `+${yen(t.amount)}` : yen(t.amount)}
-              </span>
-            </button>
+                <CategoryDot color={colorForCategory(t.category, categoryColors)} />
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate font-medium text-slate-700">
+                      {t.content}
+                    </span>
+                    {t.planActual === '予定' && (
+                      <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
+                        予定
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {t.date.slice(5).replace('-', '/')}・{t.category}
+                    {t.memo ? `・${t.memo}` : ''}
+                  </span>
+                </div>
+                <span
+                  className={`shrink-0 font-bold tabular-nums ${
+                    t.amount >= 0 ? 'text-emerald-600' : 'text-slate-700'
+                  }`}
+                >
+                  {t.amount >= 0 ? `+${yen(t.amount)}` : yen(t.amount)}
+                </span>
+              </button>
+            </SwipeRow>
           ))}
         </Card>
       )}

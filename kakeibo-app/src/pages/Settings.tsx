@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
 import { useBudgetStore } from '../store/budgetStore';
 import { useBackupStore } from '../store/backupStore';
-import type { BudgetData } from '../types';
 import { Card, CategoryDot, SectionTitle } from '../components/ui';
 import { checkForUpdate } from '../lib/pwa';
 import { shareOrDownloadBackup } from '../lib/backup';
 import { CATEGORY_PALETTE, colorForCategory } from '../lib/colors';
+import { validateBudgetData } from '../lib/validate';
+import { SortableList } from '../components/SortableList';
 
 export function Settings() {
   const categories = useBudgetStore((s) => s.categories);
@@ -14,6 +15,7 @@ export function Settings() {
   const addCategory = useBudgetStore((s) => s.addCategory);
   const renameCategory = useBudgetStore((s) => s.renameCategory);
   const deleteCategory = useBudgetStore((s) => s.deleteCategory);
+  const reorderCategories = useBudgetStore((s) => s.reorderCategories);
   const importData = useBudgetStore((s) => s.importData);
   const resetData = useBudgetStore((s) => s.resetData);
   const templates = useBudgetStore((s) => s.templates);
@@ -62,18 +64,20 @@ export function Settings() {
     : 'まだありません';
 
   const importJson = async (file: File) => {
+    let parsed: unknown;
     try {
-      const text = await file.text();
-      const data = JSON.parse(text) as BudgetData;
-      if (!Array.isArray(data.months) || !Array.isArray(data.categories)) {
-        alert('ファイル形式が正しくありません。');
-        return;
-      }
-      importData(data);
-      alert('データを読み込みました。');
+      parsed = JSON.parse(await file.text());
     } catch {
-      alert('読み込みに失敗しました。');
+      alert('JSONとして読み込めませんでした。ファイルが壊れている可能性があります。');
+      return;
     }
+    const result = validateBudgetData(parsed);
+    if (!result.ok || !result.data) {
+      alert(`読み込みに失敗しました。${result.error ?? ''}`);
+      return;
+    }
+    importData(result.data);
+    alert('データを読み込みました。');
   };
 
   const inputCls =
@@ -121,73 +125,79 @@ export function Settings() {
       <div className="space-y-3">
         <SectionTitle>カテゴリ管理</SectionTitle>
         <Card className="divide-y divide-violet-100">
-          {categories.map((c) => (
-            <div key={c} className="px-3 py-2">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setColorEditing((prev) => (prev === c ? null : c))
-                  }
-                  className="grid h-8 w-8 place-items-center rounded-lg active:bg-violet-100"
-                  aria-label="色を変更"
-                >
-                  <CategoryDot
-                    color={colorForCategory(c, categoryColors)}
-                    className="h-4 w-4"
-                  />
-                </button>
-                <input
-                  defaultValue={c}
-                  onBlur={(e) => {
-                    const v = e.target.value.trim();
-                    if (v && v !== c) renameCategory(c, v);
-                  }}
-                  className="flex-1 rounded-lg bg-transparent px-2 py-1.5 text-slate-700 focus:bg-violet-50 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm(`カテゴリ「${c}」を削除しますか？`)) deleteCategory(c);
-                  }}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 active:bg-violet-100"
-                  aria-label="削除"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M6 7h12M9 7V5h6v2M10 11v6M14 11v6M7 7l1 13h8l1-13"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+          <SortableList
+            items={categories}
+            getId={(c) => c}
+            onReorder={(names) => reorderCategories(names)}
+            renderRow={(c, handle) => (
+              <div className="px-2 py-1">
+                <div className="flex items-center gap-1">
+                  {handle}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setColorEditing((prev) => (prev === c ? null : c))
+                    }
+                    className="grid h-8 w-8 place-items-center rounded-lg active:bg-violet-100"
+                    aria-label="色を変更"
+                  >
+                    <CategoryDot
+                      color={colorForCategory(c, categoryColors)}
+                      className="h-4 w-4"
                     />
-                  </svg>
-                </button>
-              </div>
-              {colorEditing === c && (
-                <div className="anim-fade mt-1 flex flex-wrap gap-2 px-1 pb-2 pl-10">
-                  {CATEGORY_PALETTE.map((color) => {
-                    const active = colorForCategory(c, categoryColors) === color;
-                    return (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() => {
-                          setCategoryColor(c, color);
-                          setColorEditing(null);
-                        }}
-                        className={`h-7 w-7 rounded-full ring-2 transition ${
-                          active ? 'ring-slate-400' : 'ring-transparent'
-                        }`}
-                        style={{ backgroundColor: color }}
-                        aria-label={`色 ${color}`}
+                  </button>
+                  <input
+                    defaultValue={c}
+                    onBlur={(e) => {
+                      const v = e.target.value.trim();
+                      if (v && v !== c) renameCategory(c, v);
+                    }}
+                    className="flex-1 rounded-lg bg-transparent px-2 py-1.5 text-slate-700 focus:bg-violet-50 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm(`カテゴリ「${c}」を削除しますか？`)) deleteCategory(c);
+                    }}
+                    className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 active:bg-violet-100"
+                    aria-label="削除"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M6 7h12M9 7V5h6v2M10 11v6M14 11v6M7 7l1 13h8l1-13"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       />
-                    );
-                  })}
+                    </svg>
+                  </button>
                 </div>
-              )}
-            </div>
-          ))}
+                {colorEditing === c && (
+                  <div className="anim-fade mt-1 flex flex-wrap gap-2 px-1 pb-2 pl-10">
+                    {CATEGORY_PALETTE.map((color) => {
+                      const active = colorForCategory(c, categoryColors) === color;
+                      return (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => {
+                            setCategoryColor(c, color);
+                            setColorEditing(null);
+                          }}
+                          className={`h-7 w-7 rounded-full ring-2 transition ${
+                            active ? 'ring-slate-400' : 'ring-transparent'
+                          }`}
+                          style={{ backgroundColor: color }}
+                          aria-label={`色 ${color}`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          />
         </Card>
         <div className="flex gap-2">
           <input

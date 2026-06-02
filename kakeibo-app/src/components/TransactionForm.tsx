@@ -3,6 +3,8 @@ import type { PlanActual, Transaction } from '../types';
 import { useBudgetStore } from '../store/budgetStore';
 import { useBackupStore } from '../store/backupStore';
 import { todayISO } from '../lib/format';
+import { useKeyboardInset } from '../lib/useKeyboardInset';
+import { AmountTools } from './AmountTools';
 
 interface Props {
   monthId: string;
@@ -18,6 +20,10 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
   const deleteTransaction = useBudgetStore((s) => s.deleteTransaction);
   const templates = useBudgetStore((s) => s.templates);
   const addTemplate = useBudgetStore((s) => s.addTemplate);
+  const keyboardInset = useKeyboardInset();
+  const sheetMaxHeight = `calc(100dvh - ${keyboardInset}px - ${
+    keyboardInset > 0 ? 12 : 56
+  }px)`;
 
   const editing = !!initial;
   const [date, setDate] = useState(initial?.date ?? todayISO());
@@ -101,17 +107,22 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
   return (
     <div
       className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-violet-950/30 backdrop-blur-sm"
+      style={{ paddingBottom: keyboardInset }}
       onClick={onClose}
     >
       <div
-        className="anim-sheet safe-bottom w-full max-w-md rounded-t-3xl bg-white p-5 ring-1 ring-violet-200"
+        className="anim-sheet flex w-full max-w-md flex-col rounded-t-3xl bg-white ring-1 ring-violet-200"
+        style={{ maxHeight: sheetMaxHeight }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-300" />
-        <h2 className="mb-4 text-lg font-bold text-slate-800">
-          {editing ? '記録を編集' : '収支を記録'}
-        </h2>
+        <div className="shrink-0 px-5 pt-4">
+          <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-300" />
+          <h2 className="text-lg font-bold text-slate-800">
+            {editing ? '記録を編集' : '収支を記録'}
+          </h2>
+        </div>
 
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3 pt-3">
         {!editing && templates.length > 0 && (
           <div className="mb-4 flex flex-wrap gap-1.5">
             {templates.map((t) => (
@@ -169,6 +180,7 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
                 autoFocus={!editing}
               />
             </div>
+            <AmountTools value={amount} onChange={setAmount} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -260,8 +272,9 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
             </button>
           )}
         </div>
+        </div>
 
-        <div className="mt-5 flex gap-2">
+        <div className="flex shrink-0 gap-2 safe-bottom border-t border-violet-100 bg-white px-5 pb-3 pt-3">
           {editing && (
             <button
               type="button"
