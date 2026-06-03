@@ -3,8 +3,8 @@ import type { PlanActual, Transaction } from '../types';
 import { useBudgetStore } from '../store/budgetStore';
 import { useBackupStore } from '../store/backupStore';
 import { todayISO } from '../lib/format';
-import { useKeyboardInset } from '../lib/useKeyboardInset';
 import { AmountTools } from './AmountTools';
+import { FormSheet } from './FormSheet';
 
 interface Props {
   monthId: string;
@@ -20,10 +20,6 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
   const deleteTransaction = useBudgetStore((s) => s.deleteTransaction);
   const templates = useBudgetStore((s) => s.templates);
   const addTemplate = useBudgetStore((s) => s.addTemplate);
-  const keyboardInset = useKeyboardInset();
-  const sheetMaxHeight = `calc(100dvh - ${keyboardInset}px - ${
-    keyboardInset > 0 ? 12 : 56
-  }px)`;
 
   const editing = !!initial;
   const [date, setDate] = useState(initial?.date ?? todayISO());
@@ -102,204 +98,192 @@ export function TransactionForm({ monthId, initial, onClose }: Props) {
   };
 
   const inputCls =
-    'w-full rounded-xl bg-violet-50 px-3 py-2.5 text-slate-800 ring-1 ring-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400';
+    'w-full min-w-0 max-w-full rounded-xl bg-violet-50 px-3 py-2.5 text-slate-800 ring-1 ring-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400';
+
+  const footer = (
+    <>
+      {editing && (
+        <button
+          type="button"
+          onClick={remove}
+          className="rounded-xl bg-rose-100 px-4 py-3 font-semibold text-rose-500 ring-1 ring-rose-200"
+        >
+          削除
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 rounded-xl bg-slate-100 px-4 py-3 font-semibold text-slate-600"
+      >
+        キャンセル
+      </button>
+      <button
+        type="button"
+        onClick={save}
+        className="flex-1 rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 py-3 font-bold text-white shadow-md shadow-violet-300/40"
+      >
+        保存
+      </button>
+    </>
+  );
 
   return (
-    <div
-      className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-violet-950/30 backdrop-blur-sm"
-      style={{ paddingBottom: keyboardInset }}
-      onClick={onClose}
+    <FormSheet
+      title={editing ? '記録を編集' : '収支を記録'}
+      onClose={onClose}
+      footer={<div className="flex gap-2">{footer}</div>}
     >
-      <div
-        className="anim-sheet flex w-full max-w-md flex-col rounded-t-3xl bg-white ring-1 ring-violet-200"
-        style={{ maxHeight: sheetMaxHeight }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="shrink-0 px-5 pt-4">
-          <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-300" />
-          <h2 className="text-lg font-bold text-slate-800">
-            {editing ? '記録を編集' : '収支を記録'}
-          </h2>
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3 pt-3">
-        {!editing && templates.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-1.5">
-            {templates.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => applyTemplate(t)}
-                className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-600 ring-1 ring-violet-200 active:bg-violet-100"
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setKind('expense')}
-            className={`rounded-xl py-2.5 text-sm font-bold transition ${
-              kind === 'expense'
-                ? 'bg-rose-100 text-rose-600 ring-1 ring-rose-300'
-                : 'bg-slate-100 text-slate-400'
-            }`}
-          >
-            支出
-          </button>
-          <button
-            type="button"
-            onClick={() => setKind('income')}
-            className={`rounded-xl py-2.5 text-sm font-bold transition ${
-              kind === 'income'
-                ? 'bg-emerald-100 text-emerald-600 ring-1 ring-emerald-300'
-                : 'bg-slate-100 text-slate-400'
-            }`}
-          >
-            収入
-          </button>
-        </div>
-
-        <div className="mt-3 space-y-3">
-          <div>
-            <label className="mb-1 block text-xs text-slate-500">金額</label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
-                ¥
-              </span>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0"
-                className={`${inputCls} pl-7 text-right text-lg font-bold tabular-nums`}
-                autoFocus={!editing}
-              />
-            </div>
-            <AmountTools value={amount} onChange={setAmount} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs text-slate-500">日付</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-slate-500">予定/実績</label>
-              <select
-                value={planActual}
-                onChange={(e) => setPlanActual(e.target.value as PlanActual)}
-                className={inputCls}
-              >
-                <option value="実績">実績</option>
-                <option value="予定">予定</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs text-slate-500">内容</label>
-            <input
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="例: スーパー"
-              className={inputCls}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs text-slate-500">カテゴリ</label>
-              <select
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                  setItemId('');
-                }}
-                className={inputCls}
-              >
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs text-slate-500">予算項目</label>
-              <select
-                value={itemId}
-                onChange={(e) => setItemId(e.target.value)}
-                className={inputCls}
-                disabled={matchingItems.length === 0}
-              >
-                <option value="">（指定なし）</option>
-                {matchingItems.map((i) => (
-                  <option key={i.id} value={i.id}>
-                    {i.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs text-slate-500">メモ</label>
-            <input
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              placeholder="任意"
-              className={inputCls}
-            />
-          </div>
-
-          {!editing && (
+      {!editing && templates.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {templates.map((t) => (
             <button
+              key={t.id}
               type="button"
-              onClick={saveAsTemplate}
-              className="w-full rounded-xl bg-violet-50 py-2.5 text-sm font-semibold text-violet-600 ring-1 ring-violet-200 active:bg-violet-100"
+              onClick={() => applyTemplate(t)}
+              className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-600 ring-1 ring-violet-200 active:bg-violet-100"
             >
-              ＋ この内容をテンプレに保存
+              {t.label}
             </button>
-          )}
+          ))}
         </div>
-        </div>
+      )}
 
-        <div className="flex shrink-0 gap-2 safe-bottom border-t border-violet-100 bg-white px-5 pb-3 pt-3">
-          {editing && (
-            <button
-              type="button"
-              onClick={remove}
-              className="rounded-xl bg-rose-100 px-4 py-3 font-semibold text-rose-500 ring-1 ring-rose-200"
-            >
-              削除
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 rounded-xl bg-slate-100 px-4 py-3 font-semibold text-slate-600"
-          >
-            キャンセル
-          </button>
-          <button
-            type="button"
-            onClick={save}
-            className="flex-1 rounded-xl bg-gradient-to-r from-sky-400 to-violet-500 px-4 py-3 font-bold text-white shadow-md shadow-violet-300/40"
-          >
-            保存
-          </button>
-        </div>
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => setKind('expense')}
+          className={`rounded-xl py-2.5 text-sm font-bold transition ${
+            kind === 'expense'
+              ? 'bg-rose-100 text-rose-600 ring-1 ring-rose-300'
+              : 'bg-slate-100 text-slate-400'
+          }`}
+        >
+          支出
+        </button>
+        <button
+          type="button"
+          onClick={() => setKind('income')}
+          className={`rounded-xl py-2.5 text-sm font-bold transition ${
+            kind === 'income'
+              ? 'bg-emerald-100 text-emerald-600 ring-1 ring-emerald-300'
+              : 'bg-slate-100 text-slate-400'
+          }`}
+        >
+          収入
+        </button>
       </div>
-    </div>
+
+      <div className="mt-3 space-y-3">
+        <div className="min-w-0">
+          <label className="mb-1 block text-xs text-slate-500">金額</label>
+          <div className="relative min-w-0">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-violet-400">
+              ¥
+            </span>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0"
+              className={`${inputCls} pl-7 text-right text-lg font-bold tabular-nums`}
+              autoFocus={!editing}
+            />
+          </div>
+          <AmountTools value={amount} onChange={setAmount} />
+        </div>
+
+        {/* 日付と予定/実績は縦並び（iOS の date UI が隣と重なるのを防ぐ） */}
+        <div className="space-y-3">
+          <div className="min-w-0">
+            <label className="mb-1 block text-xs text-slate-500">日付</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div className="min-w-0">
+            <label className="mb-1 block text-xs text-slate-500">予定/実績</label>
+            <select
+              value={planActual}
+              onChange={(e) => setPlanActual(e.target.value as PlanActual)}
+              className={inputCls}
+            >
+              <option value="実績">実績</option>
+              <option value="予定">予定</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <label className="mb-1 block text-xs text-slate-500">内容</label>
+          <input
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="例: スーパー"
+            className={inputCls}
+          />
+        </div>
+
+        <div className="space-y-3">
+          <div className="min-w-0">
+            <label className="mb-1 block text-xs text-slate-500">カテゴリ</label>
+            <select
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setItemId('');
+              }}
+              className={inputCls}
+            >
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="min-w-0">
+            <label className="mb-1 block text-xs text-slate-500">予算項目</label>
+            <select
+              value={itemId}
+              onChange={(e) => setItemId(e.target.value)}
+              className={inputCls}
+              disabled={matchingItems.length === 0}
+            >
+              <option value="">（指定なし）</option>
+              {matchingItems.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <label className="mb-1 block text-xs text-slate-500">メモ</label>
+          <input
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="任意"
+            className={inputCls}
+          />
+        </div>
+
+        {!editing && (
+          <button
+            type="button"
+            onClick={saveAsTemplate}
+            className="w-full rounded-xl bg-violet-50 py-2.5 text-sm font-semibold text-violet-600 ring-1 ring-violet-200 active:bg-violet-100"
+          >
+            ＋ この内容をテンプレに保存
+          </button>
+        )}
+      </div>
+    </FormSheet>
   );
 }

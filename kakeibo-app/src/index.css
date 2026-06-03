@@ -44,6 +44,24 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
+/* iOS: date 入力が横にあふれて隣と重なるのを防ぐ */
+input[type='date'] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-sheet-scroll select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 /* グラデのテキスト見出しなどに使う */
 .text-gradient {
   background-image: linear-gradient(90deg, #38bdf8, #8b5cf6);
