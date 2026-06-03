@@ -41,18 +41,21 @@ export function useVisualViewportBox(): VisualViewportBox {
     window.addEventListener('resize', update);
     window.addEventListener('orientationchange', update);
     // キーボードアニメーション後に再計算
-    const onFocusIn = () => {
+    const scheduleUpdate = () => {
       update();
       window.setTimeout(update, 100);
       window.setTimeout(update, 350);
     };
-    document.addEventListener('focusin', onFocusIn);
+    document.addEventListener('focusin', scheduleUpdate);
+    // プルダウン選択・Enter でキーボードが閉じたあともレイアウトを追従
+    document.addEventListener('focusout', scheduleUpdate);
     return () => {
       vv?.removeEventListener('resize', update);
       vv?.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
       window.removeEventListener('orientationchange', update);
-      document.removeEventListener('focusin', onFocusIn);
+      document.removeEventListener('focusin', scheduleUpdate);
+      document.removeEventListener('focusout', scheduleUpdate);
     };
   }, []);
 

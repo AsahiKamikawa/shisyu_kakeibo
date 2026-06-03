@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useVisualViewportBox } from '../lib/useVisualViewportBox';
 
 /** フォーカスした入力がキーボードに隠れないよう、少し遅れてスクロールする */
@@ -22,9 +23,10 @@ export function FormSheet({
 }) {
   const vv = useVisualViewportBox();
 
-  return (
+  // main 内の fixed はタブバー（z-20）より下に描画されるため body へ出す
+  const sheet = (
     <div
-      className="anim-fade fixed z-50 flex flex-col justify-end bg-violet-950/30 backdrop-blur-sm"
+      className="anim-fade fixed z-[60] flex flex-col justify-end bg-violet-950/30 backdrop-blur-sm"
       style={{
         top: vv.top,
         left: vv.left,
@@ -55,4 +57,6 @@ export function FormSheet({
       </div>
     </div>
   );
+
+  return createPortal(sheet, document.body);
 }
